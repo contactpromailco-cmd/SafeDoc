@@ -1,0 +1,74 @@
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Production builds
+/build
+/dist
+/.next/
+/out/
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env files
+.env
+.env*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Logs
+logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Backend specific
+backend/node_modules/
+backend/dist/
+backend/.env
+
+# Backend Next.js specific
+backend-nextjs/node_modules/
+backend-nextjs/.next/
+backend-nextjs/out/
+backend-nextjs/.env.local
+
+# Frontend specific
+web-app/node_modules/
+web-app/dist/
+web-app/.env.local
+
+# Site toolset
+site toolset/node_modules/

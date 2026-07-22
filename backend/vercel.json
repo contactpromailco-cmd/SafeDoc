@@ -1,0 +1,6 @@
+{
+  "version": 2,
+  "name": "safedoc-backend",
+  "buildCommand": "npm run build",
+  "installCommand": "npm install"
+}

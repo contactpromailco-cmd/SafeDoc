@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "lib": ["ES2020"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "declaration": true
+  },
+  "include": [
+    "src/index-pusher.ts",
+    "src/pusher.ts",
+    "src/services/DocumentAnalyzer.ts",
+    "src/services/StateManager.ts",
+    "src/services/GrokAI.ts",
+    "src/services/ODFGenerator.ts"
+  ],
+  "exclude": ["node_modules", "dist", "src/index.ts", "src/services/DocumentGenerator.ts"]
+}

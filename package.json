@@ -1,0 +1,27 @@
+{
+  "name": "safedoc-workspace",
+  "version": "1.0.0",
+  "description": "Dual-application ecosystem for intelligent document analysis and generation",
+  "private": true,
+  "workspaces": [
+    "chrome-extension",
+    "web-app",
+    "backend",
+    "shared"
+  ],
+  "scripts": {
+    "install:all": "npm install && npm install --workspace=chrome-extension && npm install --workspace=web-app && npm install --workspace=backend && npm install --workspace=shared",
+    "dev": "concurrently \"npm run dev --workspace=backend\" \"npm run dev --workspace=web-app\" \"npm run dev --workspace=chrome-extension\"",
+    "build": "npm run build --workspace=shared && npm run build --workspace=backend && npm run build --workspace=web-app && npm run build --workspace=chrome-extension",
+    "build:extension": "npm run build --workspace=chrome-extension",
+    "build:web": "npm run build --workspace=web-app",
+    "build:backend": "npm run build --workspace=backend"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
