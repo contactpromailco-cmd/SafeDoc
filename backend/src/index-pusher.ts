@@ -1431,12 +1431,18 @@ import DocumentChainService from './services/DocumentChainService.js';
 import TranslationService from './services/TranslationService.js';
 import AnalyticsService from './services/AnalyticsService.js';
 import VoiceEnhancementService from './services/VoiceEnhancementService.js';
+import TemplateMarketplaceService from './services/TemplateMarketplaceService.js';
+import ClauseLibraryService from './services/ClauseLibraryService.js';
+import ComplianceCheckerService from './services/ComplianceCheckerService.js';
 
 const paymentLinkService = new PaymentLinkService();
 const documentChainService = new DocumentChainService();
 const translationService = new TranslationService();
 const analyticsService = new AnalyticsService();
 const voiceEnhancementService = new VoiceEnhancementService();
+const templateMarketplaceService = new TemplateMarketplaceService();
+const clauseLibraryService = new ClauseLibraryService();
+const complianceCheckerService = new ComplianceCheckerService();
 
 // FEATURE 1: Payment Links for Invoices
 app.post('/api/payment-links/create', requireAuth, async (req, res) => {
@@ -1729,6 +1735,297 @@ app.post('/api/voice/process-command', requireAuth, async (req, res) => {
 
 console.log('✅ Phase 1 killer features loaded');
 
+// ==================== PHASE 2 COMPETITIVE MOATS ====================
+
+// FEATURE 6: Template Marketplace
+app.get('/api/templates', async (req, res) => {
+  try {
+    const { category, industry, featured, search, priceMin, priceMax } = req.query;
+
+    const filters: any = {};
+    if (category) filters.category = category;
+    if (industry) filters.industry = industry;
+    if (featured) filters.featured = featured === 'true';
+    if (search) filters.search = search;
+    if (priceMin !== undefined || priceMax !== undefined) {
+      filters.priceRange = {
+        min: Number(priceMin) || 0,
+        max: Number(priceMax) || 999999,
+      };
+    }
+
+    const templates = templateMarketplaceService.getAllTemplates(filters);
+
+    res.json({ success: true, templates });
+  } catch (error) {
+    console.error('Get templates error:', error);
+    res.status(500).json({ error: 'Failed to get templates' });
+  }
+});
+
+app.get('/api/templates/featured', async (req, res) => {
+  try {
+    const limit = Number(req.query.limit) || 6;
+    const templates = templateMarketplaceService.getFeaturedTemplates(limit);
+
+    res.json({ success: true, templates });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get featured templates' });
+  }
+});
+
+app.get('/api/templates/trending', async (req, res) => {
+  try {
+    const limit = Number(req.query.limit) || 10;
+    const templates = templateMarketplaceService.getTrendingTemplates(limit);
+
+    res.json({ success: true, templates });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get trending templates' });
+  }
+});
+
+app.get('/api/templates/:id', async (req, res) => {
+  try {
+    const template = templateMarketplaceService.getTemplateById(req.params.id);
+
+    if (!template) {
+      return res.status(404).json({ error: 'Template not found' });
+    }
+
+    res.json({ success: true, template });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get template' });
+  }
+});
+
+app.post('/api/templates/customize', requireAuth, checkDocumentLimit, async (req, res) => {
+  try {
+    const { templateId, variables, aiEnhancements } = req.body;
+
+    const customizedContent = await templateMarketplaceService.customizeTemplate({
+      templateId,
+      variables,
+      aiEnhancements,
+    });
+
+    // Track download
+    templateMarketplaceService.trackDownload(templateId, req.user!.id);
+
+    // Track analytics
+    const user = authService.getUser(req.user!.id);
+    analyticsService.trackDocumentGeneration({
+      userId: req.user!.id,
+      userName: user?.name || user?.email || 'Unknown',
+      documentType: 'template_' + templateId,
+      duration: 15,
+      wordCount: customizedContent.split(/\s+/).length,
+      language: 'en',
+    });
+
+    // Increment usage
+    const usageResult = authService.incrementDocumentUsage(req.user!.id);
+
+    res.json({
+      success: true,
+      content: customizedContent,
+      usage: usageResult,
+    });
+  } catch (error) {
+    console.error('Template customization error:', error);
+    res.status(500).json({ error: 'Failed to customize template' });
+  }
+});
+
+app.get('/api/templates/categories', async (req, res) => {
+  try {
+    const categories = templateMarketplaceService.getCategories();
+    res.json({ success: true, categories });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get categories' });
+  }
+});
+
+app.get('/api/templates/stats', async (req, res) => {
+  try {
+    const stats = templateMarketplaceService.getMarketplaceStats();
+    res.json({ success: true, stats });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get stats' });
+  }
+});
+
+// FEATURE 10: AI Clause Library
+app.get('/api/clauses/search', async (req, res) => {
+  try {
+    const { query, category, jurisdiction, riskLevel } = req.query;
+
+    const clauses = await clauseLibraryService.searchClauses({
+      query: query as string,
+      category: category as string,
+      jurisdiction: jurisdiction as string,
+      riskLevel: riskLevel as string,
+    });
+
+    res.json({ success: true, clauses });
+  } catch (error) {
+    console.error('Clause search error:', error);
+    res.status(500).json({ error: 'Failed to search clauses' });
+  }
+});
+
+app.get('/api/clauses/popular', async (req, res) => {
+  try {
+    const limit = Number(req.query.limit) || 10;
+    const clauses = clauseLibraryService.getPopularClauses(limit);
+
+    res.json({ success: true, clauses });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get popular clauses' });
+  }
+});
+
+app.get('/api/clauses/category/:category', async (req, res) => {
+  try {
+    const clauses = clauseLibraryService.getClausesByCategory(req.params.category);
+    res.json({ success: true, clauses });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get clauses by category' });
+  }
+});
+
+app.get('/api/clauses/:id', async (req, res) => {
+  try {
+    const clause = clauseLibraryService.getClauseById(req.params.id);
+
+    if (!clause) {
+      return res.status(404).json({ error: 'Clause not found' });
+    }
+
+    res.json({ success: true, clause });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get clause' });
+  }
+});
+
+app.post('/api/clauses/generate', requireAuth, async (req, res) => {
+  try {
+    const { description, category, jurisdiction, riskPreference } = req.body;
+
+    const clause = await clauseLibraryService.generateCustomClause({
+      description,
+      category,
+      jurisdiction: jurisdiction || 'US',
+      riskPreference: riskPreference || 'balanced',
+    });
+
+    res.json({ success: true, clause });
+  } catch (error) {
+    console.error('Clause generation error:', error);
+    res.status(500).json({ error: 'Failed to generate clause' });
+  }
+});
+
+app.post('/api/clauses/recommendations', requireAuth, async (req, res) => {
+  try {
+    const { documentType, context } = req.body;
+
+    const recommendations = await clauseLibraryService.getRecommendations(
+      documentType,
+      context
+    );
+
+    res.json({ success: true, recommendations });
+  } catch (error) {
+    console.error('Clause recommendations error:', error);
+    res.status(500).json({ error: 'Failed to get recommendations' });
+  }
+});
+
+app.get('/api/clauses/categories', async (req, res) => {
+  try {
+    const categories = clauseLibraryService.getCategories();
+    res.json({ success: true, categories });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get categories' });
+  }
+});
+
+app.get('/api/clauses/stats', async (req, res) => {
+  try {
+    const stats = clauseLibraryService.getLibraryStats();
+    res.json({ success: true, stats });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get stats' });
+  }
+});
+
+// FEATURE 9: AI Compliance Checker
+app.post('/api/compliance/check', requireAuth, async (req, res) => {
+  try {
+    const { documentContent, documentType, industry, jurisdiction, standards } = req.body;
+
+    if (!documentContent || !documentType) {
+      return res.status(400).json({ error: 'Document content and type required' });
+    }
+
+    const report = await complianceCheckerService.checkCompliance({
+      documentContent,
+      documentType,
+      industry,
+      jurisdiction,
+      standards,
+    });
+
+    res.json({ success: true, report });
+  } catch (error) {
+    console.error('Compliance check error:', error);
+    res.status(500).json({ error: 'Compliance check failed' });
+  }
+});
+
+app.post('/api/compliance/auto-fix', requireAuth, async (req, res) => {
+  try {
+    const { content, issues } = req.body;
+
+    const result = await complianceCheckerService.autoFixIssues(content, issues);
+
+    res.json({ success: true, ...result });
+  } catch (error) {
+    console.error('Auto-fix error:', error);
+    res.status(500).json({ error: 'Auto-fix failed' });
+  }
+});
+
+app.get('/api/compliance/standards', async (req, res) => {
+  try {
+    const standards = complianceCheckerService.getSupportedStandards();
+    res.json({ success: true, standards });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get standards' });
+  }
+});
+
+app.get('/api/compliance/checklist/:standard', async (req, res) => {
+  try {
+    const checklist = complianceCheckerService.getComplianceChecklist(req.params.standard);
+    res.json({ success: true, checklist });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get checklist' });
+  }
+});
+
+app.get('/api/compliance/industry-requirements/:industry', async (req, res) => {
+  try {
+    const requirements = complianceCheckerService.getIndustryRequirements(req.params.industry);
+    res.json({ success: true, requirements });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get industry requirements' });
+  }
+});
+
+console.log('✅ Phase 2 competitive moats loaded');
+
 // Start server
 app.listen(PORT, () => {
   console.log(`\n🚀 SafeDoc Backend with Pusher`);
@@ -1736,11 +2033,17 @@ app.listen(PORT, () => {
   console.log(`✨ Gemini AI: Ready`);
   console.log(`📄 ODF Export: Ready`);
   console.log(`🔔 Pusher: Connected`);
-  console.log(`💰 Payment Links: ${paymentLinkService.isConfigured() ? 'Ready' : 'Disabled'}`);
-  console.log(`🔗 Document Chains: Ready`);
-  console.log(`🌍 Translation: Ready (${translationService.getSupportedLanguages().length} languages)`);
-  console.log(`📊 Analytics: Ready`);
-  console.log(`🎤 Voice Enhancement: Ready\n`);
+  console.log(`\n📦 PHASE 1 Features:`);
+  console.log(`  💰 Payment Links: ${paymentLinkService.isConfigured() ? 'Ready' : 'Disabled'}`);
+  console.log(`  🔗 Document Chains: Ready`);
+  console.log(`  🌍 Translation: Ready (${translationService.getSupportedLanguages().length} languages)`);
+  console.log(`  📊 Analytics: Ready`);
+  console.log(`  🎤 Voice Enhancement: Ready`);
+  console.log(`\n🏆 PHASE 2 Features:`);
+  console.log(`  📚 Template Marketplace: Ready (${templateMarketplaceService.getMarketplaceStats().totalTemplates} templates)`);
+  console.log(`  📋 Clause Library: Ready (${clauseLibraryService.getLibraryStats().totalClauses} clauses)`);
+  console.log(`  🛡️  Compliance Checker: Ready (${complianceCheckerService.getSupportedStandards().length} standards)`);
+  console.log(``);
 });
 
 // ==================== AUTOMATED BILLING CRON JOB ====================
