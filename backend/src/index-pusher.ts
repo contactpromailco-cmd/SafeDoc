@@ -492,6 +492,20 @@ app.post('/api/documents/generate', requireAuth, checkDocumentLimit, async (req,
       console.log(`💰 Overage charge applied: $${usageResult.overageCost.toFixed(2)} (Total this month: $${usageResult.totalOverageCost.toFixed(2)})`);
     }
 
+    // Track analytics
+    const startTime = Date.now();
+    const user = authService.getUser(req.user!.id);
+    analyticsService.trackDocumentGeneration({
+      userId: req.user!.id,
+      userName: user?.name || user?.email || 'Unknown',
+      documentType: documentType.toLowerCase(),
+      duration: Math.floor((Date.now() - startTime) / 1000),
+      wordCount: aiContent.split(/\s+/).length,
+      hasPayment: false,
+      revenue: usageResult.isOverage ? usageResult.overageCost : 0,
+      language: 'en',
+    });
+
     // Send email if requested
     if (context.emailTo && imageBuffer && emailService.isConfigured()) {
       console.log(`📧 Sending document to ${context.emailTo}...`);
@@ -524,7 +538,7 @@ app.post('/api/documents/generate', requireAuth, checkDocumentLimit, async (req,
     console.log(`✅ Document generated: ${document.metadata.id}`);
 
     // Get updated user info with overage details
-    const user = authService.getUser(req.user!.id);
+    const updatedUser = authService.getUser(req.user!.id);
     const overageInfo = authService.getOverageInfo(req.user!.id);
 
     res.json({ 
@@ -535,8 +549,8 @@ app.post('/api/documents/generate', requireAuth, checkDocumentLimit, async (req,
       },
       emailSent: context.emailTo ? true : false,
       usage: {
-        documentsUsed: user?.documentsUsed || 0,
-        documentsLimit: user?.documentsLimit || 0,
+        documentsUsed: updatedUser?.documentsUsed || 0,
+        documentsLimit: updatedUser?.documentsLimit || 0,
         overageCount: overageInfo?.overageCount || 0,
         overageCost: overageInfo?.overageCost || 0,
         overagePricePerDoc: overageInfo?.overagePricePerDoc || 0,
@@ -1410,13 +1424,323 @@ app.get('/api/documents/:id/history', async (req, res) => {
   }
 });
 
+// ==================== PHASE 1 KILLER FEATURES ====================
+
+import PaymentLinkService from './services/PaymentLinkService.js';
+import DocumentChainService from './services/DocumentChainService.js';
+import TranslationService from './services/TranslationService.js';
+import AnalyticsService from './services/AnalyticsService.js';
+import VoiceEnhancementService from './services/VoiceEnhancementService.js';
+
+const paymentLinkService = new PaymentLinkService();
+const documentChainService = new DocumentChainService();
+const translationService = new TranslationService();
+const analyticsService = new AnalyticsService();
+const voiceEnhancementService = new VoiceEnhancementService();
+
+// FEATURE 1: Payment Links for Invoices
+app.post('/api/payment-links/create', requireAuth, async (req, res) => {
+  try {
+    const { amount, description, invoiceId, customerEmail } = req.body;
+
+    if (!amount || !description || !invoiceId) {
+      return res.status(400).json({ error: 'Amount, description, and invoiceId required' });
+    }
+
+    const result = await paymentLinkService.createPaymentLink({
+      amount,
+      description,
+      invoiceId,
+      customerEmail,
+      metadata: {
+        userId: req.user!.id,
+      },
+    });
+
+    if (result.error) {
+      return res.status(500).json({ error: result.error });
+    }
+
+    res.json({ success: true, paymentUrl: result.url });
+  } catch (error) {
+    console.error('Payment link error:', error);
+    res.status(500).json({ error: 'Failed to create payment link' });
+  }
+});
+
+// FEATURE 2: AI Document Chain Suggestions
+app.post('/api/document-chain/suggestions', requireAuth, async (req, res) => {
+  try {
+    const { documentType, content, metadata } = req.body;
+
+    const suggestions = await documentChainService.getSuggestions({
+      type: documentType,
+      content,
+      metadata,
+    });
+
+    res.json({ success: true, suggestions });
+  } catch (error) {
+    console.error('Document chain error:', error);
+    res.status(500).json({ error: 'Failed to get suggestions' });
+  }
+});
+
+// Learn from user behavior
+app.post('/api/document-chain/learn', requireAuth, async (req, res) => {
+  try {
+    const { sourceDoc, targetDoc } = req.body;
+
+    await documentChainService.learnFromUserBehavior(
+      req.user!.id,
+      sourceDoc,
+      targetDoc
+    );
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Learning error:', error);
+    res.status(500).json({ error: 'Failed to learn' });
+  }
+});
+
+// FEATURE 3: Multi-Language Translation
+app.post('/api/translate', requireAuth, async (req, res) => {
+  try {
+    const { text, targetLanguage, sourceLanguage, documentType } = req.body;
+
+    if (!text || !targetLanguage) {
+      return res.status(400).json({ error: 'Text and targetLanguage required' });
+    }
+
+    const result = await translationService.translate({
+      text,
+      targetLanguage,
+      sourceLanguage: sourceLanguage || 'en',
+      documentType: documentType || 'business',
+      preserveFormatting: true,
+    });
+
+    res.json({ success: true, ...result });
+  } catch (error) {
+    console.error('Translation error:', error);
+    res.status(500).json({ error: 'Translation failed' });
+  }
+});
+
+// Get supported languages
+app.get('/api/translate/languages', (req, res) => {
+  try {
+    const languages = translationService.getSupportedLanguages();
+    const popular = translationService.getPopularLanguages();
+
+    res.json({ success: true, languages, popular });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get languages' });
+  }
+});
+
+// Detect language
+app.post('/api/translate/detect', requireAuth, async (req, res) => {
+  try {
+    const { text } = req.body;
+
+    const languageCode = await translationService.detectLanguage(text);
+
+    res.json({
+      success: true,
+      languageCode,
+      languageName: translationService.getLanguageName(languageCode),
+    });
+  } catch (error) {
+    console.error('Language detection error:', error);
+    res.status(500).json({ error: 'Detection failed' });
+  }
+});
+
+// FEATURE 4: Analytics Dashboard
+app.get('/api/analytics/dashboard', requireAuth, async (req, res) => {
+  try {
+    const metrics = analyticsService.getDashboardMetrics(req.user!.id);
+
+    res.json({ success: true, metrics });
+  } catch (error) {
+    console.error('Analytics error:', error);
+    res.status(500).json({ error: 'Failed to get analytics' });
+  }
+});
+
+// Get user-specific analytics
+app.get('/api/analytics/user', requireAuth, async (req, res) => {
+  try {
+    const analytics = analyticsService.getUserAnalytics(req.user!.id);
+
+    res.json({ success: true, ...analytics });
+  } catch (error) {
+    console.error('User analytics error:', error);
+    res.status(500).json({ error: 'Failed to get user analytics' });
+  }
+});
+
+// Get real-time stats
+app.get('/api/analytics/realtime', requireAuth, async (req, res) => {
+  try {
+    const stats = analyticsService.getRealTimeStats();
+
+    res.json({ success: true, stats });
+  } catch (error) {
+    console.error('Real-time stats error:', error);
+    res.status(500).json({ error: 'Failed to get stats' });
+  }
+});
+
+// Export analytics
+app.get('/api/analytics/export', requireAuth, async (req, res) => {
+  try {
+    const format = (req.query.format as 'json' | 'csv') || 'json';
+    const data = analyticsService.exportAnalytics(req.user!.id, format);
+
+    if (format === 'csv') {
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename="analytics.csv"');
+    } else {
+      res.setHeader('Content-Type', 'application/json');
+    }
+
+    res.send(data);
+  } catch (error) {
+    console.error('Export error:', error);
+    res.status(500).json({ error: 'Failed to export' });
+  }
+});
+
+// FEATURE 5: Enhanced Voice-to-Document
+app.post('/api/voice/transcribe', requireAuth, async (req, res) => {
+  try {
+    const { audioData, language } = req.body;
+
+    const transcript = await voiceEnhancementService.transcribeAudio(audioData, language);
+
+    res.json({ success: true, transcript });
+  } catch (error) {
+    console.error('Transcription error:', error);
+    res.status(500).json({ error: 'Transcription failed' });
+  }
+});
+
+// Analyze meeting
+app.post('/api/voice/analyze-meeting', requireAuth, async (req, res) => {
+  try {
+    const { transcript, detectSpeakers } = req.body;
+
+    let speakers;
+    if (detectSpeakers) {
+      speakers = await voiceEnhancementService.detectSpeakers(transcript);
+    }
+
+    const analysis = await voiceEnhancementService.analyzeMeeting(transcript, speakers);
+
+    res.json({ success: true, analysis, speakers });
+  } catch (error) {
+    console.error('Meeting analysis error:', error);
+    res.status(500).json({ error: 'Analysis failed' });
+  }
+});
+
+// Generate meeting minutes
+app.post('/api/voice/meeting-minutes', requireAuth, checkDocumentLimit, async (req, res) => {
+  try {
+    const { transcript, metadata } = req.body;
+
+    const speakers = await voiceEnhancementService.detectSpeakers(transcript);
+    const minutes = await voiceEnhancementService.generateMeetingMinutes(
+      transcript,
+      speakers,
+      metadata
+    );
+
+    // Create document
+    const document: Document = {
+      metadata: {
+        id: generateId(),
+        title: `Meeting Minutes - ${metadata?.title || new Date().toLocaleDateString()}`,
+        type: 'CUSTOM' as DocumentType,
+        createdAt: new Date(),
+        modifiedAt: new Date(),
+        source: 'meeting' as any,
+      },
+      content: minutes,
+    };
+
+    await stateManager.addDocument(document);
+
+    // Track analytics
+    analyticsService.trackDocumentGeneration({
+      userId: req.user!.id,
+      userName: req.user!.email,
+      documentType: 'meeting_minutes',
+      duration: 30,
+      wordCount: minutes.split(/\s+/).length,
+      language: 'en',
+    });
+
+    // Increment usage
+    const usageResult = authService.incrementDocumentUsage(req.user!.id);
+
+    res.json({
+      success: true,
+      document,
+      minutes,
+      usage: usageResult,
+    });
+  } catch (error) {
+    console.error('Meeting minutes error:', error);
+    res.status(500).json({ error: 'Failed to generate meeting minutes' });
+  }
+});
+
+// Extract intent from voice
+app.post('/api/voice/extract-intent', requireAuth, async (req, res) => {
+  try {
+    const { voiceCommand, context } = req.body;
+
+    const intent = await voiceEnhancementService.extractIntent(voiceCommand, context);
+
+    res.json({ success: true, intent });
+  } catch (error) {
+    console.error('Intent extraction error:', error);
+    res.status(500).json({ error: 'Intent extraction failed' });
+  }
+});
+
+// Process voice command
+app.post('/api/voice/process-command', requireAuth, async (req, res) => {
+  try {
+    const { command, userHistory } = req.body;
+
+    const result = await voiceEnhancementService.processVoiceCommand(command, userHistory);
+
+    res.json({ success: true, ...result });
+  } catch (error) {
+    console.error('Voice command error:', error);
+    res.status(500).json({ error: 'Command processing failed' });
+  }
+});
+
+console.log('✅ Phase 1 killer features loaded');
+
 // Start server
 app.listen(PORT, () => {
   console.log(`\n🚀 SafeDoc Backend with Pusher`);
   console.log(`📡 HTTP API: http://localhost:${PORT}`);
-  console.log(`✨ Grok AI: Ready`);
+  console.log(`✨ Gemini AI: Ready`);
   console.log(`📄 ODF Export: Ready`);
-  console.log(`🔔 Pusher: Connected\n`);
+  console.log(`🔔 Pusher: Connected`);
+  console.log(`💰 Payment Links: ${paymentLinkService.isConfigured() ? 'Ready' : 'Disabled'}`);
+  console.log(`🔗 Document Chains: Ready`);
+  console.log(`🌍 Translation: Ready (${translationService.getSupportedLanguages().length} languages)`);
+  console.log(`📊 Analytics: Ready`);
+  console.log(`🎤 Voice Enhancement: Ready\n`);
 });
 
 // ==================== AUTOMATED BILLING CRON JOB ====================
