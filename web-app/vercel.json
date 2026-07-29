@@ -1,12 +1,11 @@
 {
-  "version": 2,
-  "name": "safedoc-ai",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
-  "env": {
-    "VITE_PUSHER_KEY": "ab96fbeb449d4f90ca68",
-    "VITE_PUSHER_CLUSTER": "eu",
-    "VITE_API_URL": "https://your-backend-url.vercel.app"
-  }
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
