@@ -1434,6 +1434,9 @@ import VoiceEnhancementService from './services/VoiceEnhancementService.js';
 import TemplateMarketplaceService from './services/TemplateMarketplaceService.js';
 import ClauseLibraryService from './services/ClauseLibraryService.js';
 import ComplianceCheckerService from './services/ComplianceCheckerService.js';
+import ESignatureService from './services/ESignatureService.js';
+import CRMIntegrationService from './services/CRMIntegrationService.js';
+import WebhookService from './services/WebhookService.js';
 
 const paymentLinkService = new PaymentLinkService();
 const documentChainService = new DocumentChainService();
@@ -1443,6 +1446,9 @@ const voiceEnhancementService = new VoiceEnhancementService();
 const templateMarketplaceService = new TemplateMarketplaceService();
 const clauseLibraryService = new ClauseLibraryService();
 const complianceCheckerService = new ComplianceCheckerService();
+const eSignatureService = new ESignatureService();
+const crmIntegrationService = new CRMIntegrationService();
+const webhookService = new WebhookService();
 
 // FEATURE 1: Payment Links for Invoices
 app.post('/api/payment-links/create', requireAuth, async (req, res) => {
@@ -2026,6 +2032,376 @@ app.get('/api/compliance/industry-requirements/:industry', async (req, res) => {
 
 console.log('✅ Phase 2 competitive moats loaded');
 
+// ==================== PHASE 3 ENTERPRISE FEATURES ====================
+
+// FEATURE 8: Smart E-Signatures
+app.post('/api/signatures/create', requireAuth, async (req, res) => {
+  try {
+    const { documentId, documentTitle, documentContent, signers, signatureOrder, expiresInDays } = req.body;
+
+    const request = eSignatureService.createSignatureRequest({
+      documentId,
+      documentTitle,
+      documentContent,
+      createdBy: req.user!.id,
+      signers,
+      signatureOrder,
+      expiresInDays,
+    });
+
+    // Trigger webhook
+    await webhookService.triggerEvent({
+      userId: req.user!.id,
+      event: 'signature.requested',
+      data: { requestId: request.id, documentId, signers: signers.map((s: any) => s.email) },
+    });
+
+    res.json({ success: true, request });
+  } catch (error) {
+    console.error('Signature creation error:', error);
+    res.status(500).json({ error: 'Failed to create signature request' });
+  }
+});
+
+app.post('/api/signatures/:requestId/sign', async (req, res) => {
+  try {
+    const { signerId, signature, ipAddress, userAgent, location } = req.body;
+
+    const result = eSignatureService.signDocument({
+      requestId: req.params.requestId,
+      signerId,
+      signature,
+      ipAddress,
+      userAgent,
+      location,
+    });
+
+    if (!result.success) {
+      return res.status(400).json({ error: result.error });
+    }
+
+    // Trigger webhook if completed
+    if (result.request?.status === 'completed') {
+      const request = result.request;
+      await webhookService.triggerEvent({
+        userId: request.createdBy,
+        event: 'signature.completed',
+        data: { requestId: request.id, documentId: request.documentId },
+      });
+    }
+
+    res.json({ success: true, request: result.request });
+  } catch (error) {
+    console.error('Signing error:', error);
+    res.status(500).json({ error: 'Failed to sign document' });
+  }
+});
+
+app.post('/api/signatures/:requestId/decline', async (req, res) => {
+  try {
+    const { signerId, reason } = req.body;
+
+    const result = eSignatureService.declineSignature(req.params.requestId, signerId, reason);
+
+    if (!result.success) {
+      return res.status(400).json({ error: result.error });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Decline error:', error);
+    res.status(500).json({ error: 'Failed to decline signature' });
+  }
+});
+
+app.get('/api/signatures/:requestId', async (req, res) => {
+  try {
+    const request = eSignatureService.getSignatureRequest(req.params.requestId);
+
+    if (!request) {
+      return res.status(404).json({ error: 'Request not found' });
+    }
+
+    res.json({ success: true, request });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get request' });
+  }
+});
+
+app.get('/api/signatures/:requestId/document', async (req, res) => {
+  try {
+    const signedDocument = eSignatureService.generateSignedDocument(req.params.requestId);
+
+    if (!signedDocument) {
+      return res.status(404).json({ error: 'Document not available' });
+    }
+
+    res.json({ success: true, document: signedDocument });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to generate document' });
+  }
+});
+
+app.get('/api/signatures/:requestId/audit', async (req, res) => {
+  try {
+    const auditLog = eSignatureService.getAuditLog(req.params.requestId);
+
+    res.json({ success: true, auditLog });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get audit log' });
+  }
+});
+
+app.post('/api/signatures/:requestId/remind', async (req, res) => {
+  try {
+    const { signerId } = req.body;
+
+    const result = eSignatureService.sendReminder(req.params.requestId, signerId);
+
+    res.json({ success: result.success, sent: result.sent });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to send reminder' });
+  }
+});
+
+app.get('/api/signatures/stats', requireAuth, async (req, res) => {
+  try {
+    const stats = eSignatureService.getStatistics();
+    res.json({ success: true, stats });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get stats' });
+  }
+});
+
+// FEATURE 12: CRM Integration
+app.post('/api/crm/connect', requireAuth, async (req, res) => {
+  try {
+    const { platform, accessToken, refreshToken, expiresAt } = req.body;
+
+    const connection = crmIntegrationService.connectCRM({
+      userId: req.user!.id,
+      platform,
+      accessToken,
+      refreshToken,
+      expiresAt,
+    });
+
+    res.json({ success: true, connection });
+  } catch (error) {
+    console.error('CRM connection error:', error);
+    res.status(500).json({ error: 'Failed to connect CRM' });
+  }
+});
+
+app.get('/api/crm/connections', requireAuth, async (req, res) => {
+  try {
+    const connections = crmIntegrationService.getUserConnections(req.user!.id);
+    res.json({ success: true, connections });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get connections' });
+  }
+});
+
+app.delete('/api/crm/connections/:connectionId', requireAuth, async (req, res) => {
+  try {
+    const success = crmIntegrationService.disconnectCRM(req.params.connectionId);
+
+    res.json({ success });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to disconnect CRM' });
+  }
+});
+
+app.post('/api/crm/sync', requireAuth, async (req, res) => {
+  try {
+    const { documentId, documentTitle, documentType, amount, contactEmail, connectionId } = req.body;
+
+    const result = await crmIntegrationService.syncDocumentToCRM({
+      documentId,
+      documentTitle,
+      documentType,
+      amount,
+      contactEmail,
+      connectionId,
+    });
+
+    res.json(result);
+  } catch (error) {
+    console.error('CRM sync error:', error);
+    res.status(500).json({ error: 'Failed to sync to CRM' });
+  }
+});
+
+app.get('/api/crm/:connectionId/contacts', requireAuth, async (req, res) => {
+  try {
+    const contacts = await crmIntegrationService.getCRMContacts(req.params.connectionId);
+    res.json({ success: true, contacts });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get contacts' });
+  }
+});
+
+app.get('/api/crm/:connectionId/deals', requireAuth, async (req, res) => {
+  try {
+    const deals = await crmIntegrationService.getCRMDeals(req.params.connectionId);
+    res.json({ success: true, deals });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get deals' });
+  }
+});
+
+app.get('/api/crm/platforms', async (req, res) => {
+  try {
+    const platforms = crmIntegrationService.getSupportedPlatforms();
+    res.json({ success: true, platforms });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get platforms' });
+  }
+});
+
+app.get('/api/crm/stats', requireAuth, async (req, res) => {
+  try {
+    const stats = crmIntegrationService.getStatistics(req.user!.id);
+    res.json({ success: true, stats });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get stats' });
+  }
+});
+
+// FEATURE: Webhooks & API
+app.post('/api/webhooks', requireAuth, async (req, res) => {
+  try {
+    const { url, events, metadata } = req.body;
+
+    const webhook = webhookService.createWebhook({
+      userId: req.user!.id,
+      url,
+      events,
+      metadata,
+    });
+
+    res.json({ success: true, webhook });
+  } catch (error) {
+    console.error('Webhook creation error:', error);
+    res.status(500).json({ error: 'Failed to create webhook' });
+  }
+});
+
+app.get('/api/webhooks', requireAuth, async (req, res) => {
+  try {
+    const webhooks = webhookService.getUserWebhooks(req.user!.id);
+    res.json({ success: true, webhooks });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get webhooks' });
+  }
+});
+
+app.get('/api/webhooks/:webhookId', requireAuth, async (req, res) => {
+  try {
+    const webhook = webhookService.getWebhook(req.params.webhookId);
+
+    if (!webhook) {
+      return res.status(404).json({ error: 'Webhook not found' });
+    }
+
+    res.json({ success: true, webhook });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get webhook' });
+  }
+});
+
+app.patch('/api/webhooks/:webhookId', requireAuth, async (req, res) => {
+  try {
+    const { url, events, active, metadata } = req.body;
+
+    const webhook = webhookService.updateWebhook(req.params.webhookId, {
+      url,
+      events,
+      active,
+      metadata,
+    });
+
+    if (!webhook) {
+      return res.status(404).json({ error: 'Webhook not found' });
+    }
+
+    res.json({ success: true, webhook });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update webhook' });
+  }
+});
+
+app.delete('/api/webhooks/:webhookId', requireAuth, async (req, res) => {
+  try {
+    const success = webhookService.deleteWebhook(req.params.webhookId);
+
+    res.json({ success });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete webhook' });
+  }
+});
+
+app.get('/api/webhooks/:webhookId/deliveries', requireAuth, async (req, res) => {
+  try {
+    const limit = Number(req.query.limit) || 50;
+    const deliveries = webhookService.getWebhookDeliveries(req.params.webhookId, limit);
+
+    res.json({ success: true, deliveries });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get deliveries' });
+  }
+});
+
+app.get('/api/webhooks/:webhookId/stats', requireAuth, async (req, res) => {
+  try {
+    const stats = webhookService.getStatistics(req.params.webhookId);
+
+    if (!stats) {
+      return res.status(404).json({ error: 'Webhook not found' });
+    }
+
+    res.json({ success: true, stats });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get stats' });
+  }
+});
+
+app.post('/api/webhooks/:webhookId/test', requireAuth, async (req, res) => {
+  try {
+    const result = await webhookService.testWebhook(req.params.webhookId);
+
+    res.json(result);
+  } catch (error) {
+    console.error('Webhook test error:', error);
+    res.status(500).json({ error: 'Failed to test webhook' });
+  }
+});
+
+app.post('/api/webhooks/:webhookId/rotate-secret', requireAuth, async (req, res) => {
+  try {
+    const result = webhookService.rotateSecret(req.params.webhookId);
+
+    if (!result) {
+      return res.status(404).json({ error: 'Webhook not found' });
+    }
+
+    res.json({ success: true, secret: result.secret });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to rotate secret' });
+  }
+});
+
+app.get('/api/webhooks/events', async (req, res) => {
+  try {
+    const events = webhookService.getSupportedEvents();
+    res.json({ success: true, events });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to get events' });
+  }
+});
+
+console.log('✅ Phase 3 enterprise features loaded');
+
 // Start server
 app.listen(PORT, () => {
   console.log(`\n🚀 SafeDoc Backend with Pusher`);
@@ -2043,6 +2419,10 @@ app.listen(PORT, () => {
   console.log(`  📚 Template Marketplace: Ready (${templateMarketplaceService.getMarketplaceStats().totalTemplates} templates)`);
   console.log(`  📋 Clause Library: Ready (${clauseLibraryService.getLibraryStats().totalClauses} clauses)`);
   console.log(`  🛡️  Compliance Checker: Ready (${complianceCheckerService.getSupportedStandards().length} standards)`);
+  console.log(`\n🏢 PHASE 3 Features:`);
+  console.log(`  ✍️  E-Signatures: Ready`);
+  console.log(`  🔗 CRM Integration: Ready (${crmIntegrationService.getSupportedPlatforms().length} platforms)`);
+  console.log(`  🪝 Webhooks & API: Ready (${webhookService.getSupportedEvents().length} events)`);
   console.log(``);
 });
 
