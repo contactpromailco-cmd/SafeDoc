@@ -1,0 +1,440 @@
+/**
+ * Landing Page - SafeDoc AI
+ * High-converting landing page with hero, features, pricing, and CTA
+ */
+
+import React, { useState } from 'react';
+import AuthModal from '../components/AuthModal';
+
+const Landing: React.FC = () => {
+  const [showAuth, setShowAuth] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('register');
+
+  const handleGetStarted = () => {
+    setAuthMode('register');
+    setShowAuth(true);
+  };
+
+  const handleLogin = () => {
+    setAuthMode('login');
+    setShowAuth(true);
+  };
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Navigation */}
+      <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-lg border-b border-gray-200 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <span className="text-2xl">📄</span>
+              </div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                SafeDoc AI
+              </span>
+            </div>
+            
+            <div className="hidden md:flex items-center space-x-8">
+              <a href="#features" className="text-gray-600 hover:text-gray-900">Features</a>
+              <a href="#pricing" className="text-gray-600 hover:text-gray-900">Pricing</a>
+              <a href="https://github.com/contactpromailco-cmd/SafeDoc" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-gray-900">
+                GitHub
+              </a>
+              <button
+                onClick={handleLogin}
+                className="text-gray-600 hover:text-gray-900 font-medium"
+              >
+                Sign In
+              </button>
+              <button
+                onClick={handleGetStarted}
+                className="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg transition-all"
+              >
+                Get Started Free
+              </button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="pt-32 pb-20 px-6">
+        <div className="max-w-7xl mx-auto text-center">
+          <div className="inline-block mb-4 px-4 py-2 bg-blue-50 rounded-full">
+            <span className="text-sm font-medium text-blue-600">
+              🚀 All 11 Features Live • 50+ Languages • Enterprise Ready
+            </span>
+          </div>
+          
+          <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
+            AI-Powered Documents
+            <br />
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              That Do Everything
+            </span>
+          </h1>
+          
+          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+            Generate, translate, sign, sync, and track business documents in seconds.
+            From invoices to contracts, in 50+ languages, with full compliance.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            <button
+              onClick={handleGetStarted}
+              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold text-lg hover:shadow-2xl transition-all transform hover:scale-105"
+            >
+              Start Free → 10 docs/month
+            </button>
+            <button
+              onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })}
+              className="px-8 py-4 bg-white border-2 border-gray-200 rounded-xl font-semibold text-lg hover:border-gray-300 transition-all"
+            >
+              Watch Demo
+            </button>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+            <div>
+              <div className="text-3xl font-bold text-gray-900">11</div>
+              <div className="text-sm text-gray-600">Features</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-gray-900">50+</div>
+              <div className="text-sm text-gray-600">Languages</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-gray-900">1000+</div>
+              <div className="text-sm text-gray-600">Legal Clauses</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-gray-900">$12</div>
+              <div className="text-sm text-gray-600">/month Pro</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section id="features" className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">Everything You Need. One Platform.</h2>
+            <p className="text-xl text-gray-600">Features that would cost $500+/month elsewhere. Included in every plan.</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Feature Cards */}
+            {[
+              {
+                icon: '🤖',
+                title: 'AI Document Generation',
+                description: 'Generate invoices, contracts, NDAs, proposals instantly with Gemini AI',
+                badge: 'Core'
+              },
+              {
+                icon: '🌍',
+                title: '50+ Languages',
+                description: 'Translate documents to Spanish, French, Chinese, Arabic, and 46 more',
+                badge: 'Global'
+              },
+              {
+                icon: '✍️',
+                title: 'E-Signatures',
+                description: 'Legal e-signatures with audit trails. ESIGN, UETA, eIDAS compliant',
+                badge: 'Legal'
+              },
+              {
+                icon: '💰',
+                title: 'Payment Links',
+                description: 'Embedded Stripe payment buttons. Get paid 40% faster',
+                badge: 'Revenue'
+              },
+              {
+                icon: '🛡️',
+                title: 'Compliance Checker',
+                description: 'Auto-scan for GDPR, CCPA, HIPAA, SOC2. Pass audits easily',
+                badge: 'Security'
+              },
+              {
+                icon: '🔗',
+                title: 'CRM Integration',
+                description: 'Sync to HubSpot, Salesforce, Pipedrive, Zoho automatically',
+                badge: 'Automation'
+              },
+              {
+                icon: '📚',
+                title: 'Template Marketplace',
+                description: '100+ professional templates. Create and sell your own',
+                badge: 'Community'
+              },
+              {
+                icon: '📋',
+                title: '1000+ Legal Clauses',
+                description: 'Pre-vetted clauses for any contract. Jurisdiction-aware',
+                badge: 'Legal'
+              },
+              {
+                icon: '🎤',
+                title: 'Voice-to-Document',
+                description: 'Record meetings, get instant transcripts and action items',
+                badge: 'AI'
+              },
+              {
+                icon: '📊',
+                title: 'Analytics Dashboard',
+                description: 'Track every document, revenue, and user behavior',
+                badge: 'Insights'
+              },
+              {
+                icon: '🔄',
+                title: 'Smart Chains',
+                description: 'AI suggests next documents. Complete workflows faster',
+                badge: 'AI'
+              },
+              {
+                icon: '🪝',
+                title: 'Webhooks & API',
+                description: '61 REST endpoints. 12+ webhook events. Build anything',
+                badge: 'Developer'
+              }
+            ].map((feature, i) => (
+              <div
+                key={i}
+                className="bg-white p-6 rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="text-4xl">{feature.icon}</div>
+                  <span className="text-xs font-medium px-2 py-1 bg-blue-50 text-blue-600 rounded-full">
+                    {feature.badge}
+                  </span>
+                </div>
+                <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
+                <p className="text-gray-600 text-sm">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section id="pricing" className="py-20">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">Simple, Transparent Pricing</h2>
+            <p className="text-xl text-gray-600">No hidden fees. Cancel anytime. All features included.</p>
+          </div>
+
+          <div className="grid md:grid-cols-4 gap-6">
+            {/* Free */}
+            <div className="bg-white p-8 rounded-2xl border-2 border-gray-200">
+              <div className="text-sm font-medium text-gray-600 mb-2">Free</div>
+              <div className="text-4xl font-bold mb-4">$0</div>
+              <div className="text-sm text-gray-600 mb-6">Perfect to try</div>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-sm">10 documents/month</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-sm">5 languages</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-sm">Basic templates</span>
+                </li>
+              </ul>
+              <button
+                onClick={handleGetStarted}
+                className="w-full py-3 border-2 border-gray-200 rounded-xl font-medium hover:border-gray-300 transition-all"
+              >
+                Get Started
+              </button>
+            </div>
+
+            {/* Pro */}
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-8 rounded-2xl border-2 border-blue-500 relative">
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full">
+                POPULAR
+              </div>
+              <div className="text-sm font-medium text-blue-600 mb-2">Pro</div>
+              <div className="text-4xl font-bold mb-4">$12</div>
+              <div className="text-sm text-gray-600 mb-6">For freelancers</div>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-sm font-medium">75 documents/month</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-sm font-medium">50+ languages</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-sm font-medium">All features</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-sm">$0.50 per extra doc</span>
+                </li>
+              </ul>
+              <button
+                onClick={handleGetStarted}
+                className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+              >
+                Start Pro Trial
+              </button>
+            </div>
+
+            {/* Business */}
+            <div className="bg-white p-8 rounded-2xl border-2 border-gray-200">
+              <div className="text-sm font-medium text-gray-600 mb-2">Business</div>
+              <div className="text-4xl font-bold mb-4">$39</div>
+              <div className="text-sm text-gray-600 mb-6">For teams</div>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-sm font-medium">Unlimited documents</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-sm">Team collaboration</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-sm">CRM integration</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-500 mr-2">✓</span>
+                  <span className="text-sm">Priority support</span>
+                </li>
+              </ul>
+              <button
+                onClick={handleGetStarted}
+                className="w-full py-3 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-all"
+              >
+                Start Business
+              </button>
+            </div>
+
+            {/* Enterprise */}
+            <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-8 rounded-2xl text-white">
+              <div className="text-sm font-medium text-gray-300 mb-2">Enterprise</div>
+              <div className="text-4xl font-bold mb-4">$199</div>
+              <div className="text-sm text-gray-300 mb-6">For companies</div>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-start">
+                  <span className="text-green-400 mr-2">✓</span>
+                  <span className="text-sm">Everything in Business</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-400 mr-2">✓</span>
+                  <span className="text-sm">White-label</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-400 mr-2">✓</span>
+                  <span className="text-sm">SSO & SAML</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-400 mr-2">✓</span>
+                  <span className="text-sm">99.9% SLA</span>
+                </li>
+              </ul>
+              <button
+                onClick={handleGetStarted}
+                className="w-full py-3 bg-white text-gray-900 rounded-xl font-semibold hover:bg-gray-100 transition-all"
+              >
+                Contact Sales
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-br from-blue-600 to-purple-600">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            Ready to Transform Your Documents?
+          </h2>
+          <p className="text-xl text-blue-100 mb-8">
+            Join thousands of businesses using SafeDoc AI to save time and money.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button
+              onClick={handleGetStarted}
+              className="px-8 py-4 bg-white text-blue-600 rounded-xl font-semibold text-lg hover:shadow-2xl transition-all transform hover:scale-105"
+            >
+              Start Free Today
+            </button>
+            <button
+              onClick={() => window.open('https://github.com/contactpromailco-cmd/SafeDoc', '_blank')}
+              className="px-8 py-4 bg-blue-700 text-white rounded-xl font-semibold text-lg hover:bg-blue-800 transition-all"
+            >
+              View on GitHub
+            </button>
+          </div>
+          <p className="text-blue-100 mt-6 text-sm">
+            No credit card required • 10 documents free • Cancel anytime
+          </p>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 bg-gray-900 text-gray-300">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <span className="text-2xl">📄</span>
+                <span className="text-xl font-bold text-white">SafeDoc AI</span>
+              </div>
+              <p className="text-sm">
+                AI-powered business documents. Generate, translate, sign, and sync in seconds.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold text-white mb-3">Product</h3>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#features" className="hover:text-white">Features</a></li>
+                <li><a href="#pricing" className="hover:text-white">Pricing</a></li>
+                <li><a href="https://github.com/contactpromailco-cmd/SafeDoc" target="_blank" rel="noopener noreferrer" className="hover:text-white">API Docs</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-white mb-3">Company</h3>
+              <ul className="space-y-2 text-sm">
+                <li><a href="https://github.com/contactpromailco-cmd/SafeDoc" target="_blank" rel="noopener noreferrer" className="hover:text-white">GitHub</a></li>
+                <li><a href="#" className="hover:text-white">Blog</a></li>
+                <li><a href="#" className="hover:text-white">Contact</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold text-white mb-3">Legal</h3>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="hover:text-white">Privacy</a></li>
+                <li><a href="#" className="hover:text-white">Terms</a></li>
+                <li><a href="#" className="hover:text-white">Security</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
+            <p>© 2025 SafeDoc AI. All rights reserved. Built with 💙 and AI.</p>
+          </div>
+        </div>
+      </footer>
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={showAuth}
+        onClose={() => setShowAuth(false)}
+        defaultMode={authMode}
+      />
+    </div>
+  );
+};
+
+export default Landing;
