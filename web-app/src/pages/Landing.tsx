@@ -235,132 +235,199 @@ const Landing: React.FC = () => {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-20">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Simple, Transparent Pricing</h2>
-            <p className="text-xl text-gray-600">No hidden fees. Cancel anytime. All features included.</p>
+      <section id="pricing" className="py-16 sm:py-20 bg-gradient-to-b from-white to-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-3 sm:mb-4 text-gray-900">Simple, Transparent Pricing</h2>
+            <p className="text-lg sm:text-xl text-gray-600">No hidden fees. Cancel anytime. All features included.</p>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-6">
-            {/* Free */}
-            <div className="bg-white p-8 rounded-2xl border-2 border-gray-200">
-              <div className="text-sm font-medium text-gray-600 mb-2">Free</div>
-              <div className="text-4xl font-bold mb-4">$0</div>
-              <div className="text-sm text-gray-600 mb-6">Perfect to try</div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            {/* Free Tier */}
+            <div className="bg-white p-6 sm:p-8 rounded-2xl border-2 border-gray-200 hover:border-gray-300 transition-all shadow-sm hover:shadow-md">
+              <div className="mb-6">
+                <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Free</div>
+                <div className="flex items-baseline mb-2">
+                  <span className="text-4xl sm:text-5xl font-bold text-gray-900">$0</span>
+                  <span className="text-gray-500 ml-2">/month</span>
+                </div>
+                <p className="text-sm text-gray-600">Perfect to try</p>
+              </div>
+              
               <ul className="space-y-3 mb-8">
-                <li className="flex items-start">
-                  <span className="text-green-500 mr-2">✓</span>
+                <li className="flex items-start text-gray-700">
+                  <svg className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                  </svg>
                   <span className="text-sm">10 documents/month</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="text-green-500 mr-2">✓</span>
+                <li className="flex items-start text-gray-700">
+                  <svg className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                  </svg>
                   <span className="text-sm">5 languages</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="text-green-500 mr-2">✓</span>
+                <li className="flex items-start text-gray-700">
+                  <svg className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                  </svg>
                   <span className="text-sm">Basic templates</span>
                 </li>
+                <li className="flex items-start text-gray-700">
+                  <svg className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                  </svg>
+                  <span className="text-sm">Email support</span>
+                </li>
               </ul>
+              
               <button
                 onClick={handleGetStarted}
-                className="w-full py-3 border-2 border-gray-200 rounded-xl font-medium hover:border-gray-300 transition-all"
+                className="w-full py-3 px-4 border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-all text-sm"
               >
                 Get Started
               </button>
             </div>
 
-            {/* Pro */}
-            <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-8 rounded-2xl border-2 border-blue-500 relative">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full">
-                POPULAR
+            {/* Pro Tier - Popular */}
+            <div className="bg-gradient-to-br from-blue-50 via-blue-50 to-purple-50 p-6 sm:p-8 rounded-2xl border-2 border-blue-500 relative shadow-lg hover:shadow-xl transition-all transform hover:scale-105">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <span className="inline-block px-4 py-1 bg-blue-500 text-white text-xs font-bold rounded-full uppercase tracking-wide shadow-md">
+                  Most Popular
+                </span>
               </div>
-              <div className="text-sm font-medium text-blue-600 mb-2">Pro</div>
-              <div className="text-4xl font-bold mb-4">$12</div>
-              <div className="text-sm text-gray-600 mb-6">For freelancers</div>
+              
+              <div className="mb-6 mt-2">
+                <div className="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-2">Pro</div>
+                <div className="flex items-baseline mb-2">
+                  <span className="text-4xl sm:text-5xl font-bold text-gray-900">$12</span>
+                  <span className="text-gray-600 ml-2">/month</span>
+                </div>
+                <p className="text-sm text-gray-600">For freelancers</p>
+              </div>
+              
               <ul className="space-y-3 mb-8">
-                <li className="flex items-start">
-                  <span className="text-green-500 mr-2">✓</span>
-                  <span className="text-sm font-medium">75 documents/month</span>
+                <li className="flex items-start text-gray-800">
+                  <svg className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                  </svg>
+                  <span className="text-sm font-semibold">75 documents/month</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="text-green-500 mr-2">✓</span>
-                  <span className="text-sm font-medium">50+ languages</span>
+                <li className="flex items-start text-gray-800">
+                  <svg className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                  </svg>
+                  <span className="text-sm font-semibold">50+ languages</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="text-green-500 mr-2">✓</span>
-                  <span className="text-sm font-medium">All features</span>
+                <li className="flex items-start text-gray-800">
+                  <svg className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                  </svg>
+                  <span className="text-sm font-semibold">All 11 features</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="text-green-500 mr-2">✓</span>
+                <li className="flex items-start text-gray-800">
+                  <svg className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                  </svg>
                   <span className="text-sm">$0.50 per extra doc</span>
                 </li>
               </ul>
+              
               <button
                 onClick={handleGetStarted}
-                className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+                className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold hover:shadow-xl transition-all text-sm"
               >
-                Start Pro Trial
+                Start Free Trial
               </button>
             </div>
 
-            {/* Business */}
-            <div className="bg-white p-8 rounded-2xl border-2 border-gray-200">
-              <div className="text-sm font-medium text-gray-600 mb-2">Business</div>
-              <div className="text-4xl font-bold mb-4">$39</div>
-              <div className="text-sm text-gray-600 mb-6">For teams</div>
+            {/* Business Tier */}
+            <div className="bg-white p-6 sm:p-8 rounded-2xl border-2 border-gray-200 hover:border-gray-300 transition-all shadow-sm hover:shadow-md">
+              <div className="mb-6">
+                <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Business</div>
+                <div className="flex items-baseline mb-2">
+                  <span className="text-4xl sm:text-5xl font-bold text-gray-900">$39</span>
+                  <span className="text-gray-500 ml-2">/month</span>
+                </div>
+                <p className="text-sm text-gray-600">For teams</p>
+              </div>
+              
               <ul className="space-y-3 mb-8">
-                <li className="flex items-start">
-                  <span className="text-green-500 mr-2">✓</span>
-                  <span className="text-sm font-medium">Unlimited documents</span>
+                <li className="flex items-start text-gray-700">
+                  <svg className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                  </svg>
+                  <span className="text-sm font-semibold">Unlimited documents</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="text-green-500 mr-2">✓</span>
+                <li className="flex items-start text-gray-700">
+                  <svg className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                  </svg>
                   <span className="text-sm">Team collaboration</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="text-green-500 mr-2">✓</span>
+                <li className="flex items-start text-gray-700">
+                  <svg className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                  </svg>
                   <span className="text-sm">CRM integration</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="text-green-500 mr-2">✓</span>
+                <li className="flex items-start text-gray-700">
+                  <svg className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                  </svg>
                   <span className="text-sm">Priority support</span>
                 </li>
               </ul>
+              
               <button
                 onClick={handleGetStarted}
-                className="w-full py-3 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-all"
+                className="w-full py-3 px-4 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-all text-sm"
               >
                 Start Business
               </button>
             </div>
 
-            {/* Enterprise */}
-            <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-8 rounded-2xl text-white">
-              <div className="text-sm font-medium text-gray-300 mb-2">Enterprise</div>
-              <div className="text-4xl font-bold mb-4">$199</div>
-              <div className="text-sm text-gray-300 mb-6">For companies</div>
+            {/* Enterprise Tier */}
+            <div className="bg-gradient-to-br from-gray-900 via-gray-900 to-gray-800 p-6 sm:p-8 rounded-2xl text-white shadow-lg hover:shadow-xl transition-all">
+              <div className="mb-6">
+                <div className="text-sm font-semibold text-gray-400 uppercase tracking-wide mb-2">Enterprise</div>
+                <div className="flex items-baseline mb-2">
+                  <span className="text-4xl sm:text-5xl font-bold text-white">$199</span>
+                  <span className="text-gray-400 ml-2">/month</span>
+                </div>
+                <p className="text-sm text-gray-400">For companies</p>
+              </div>
+              
               <ul className="space-y-3 mb-8">
-                <li className="flex items-start">
-                  <span className="text-green-400 mr-2">✓</span>
+                <li className="flex items-start text-gray-200">
+                  <svg className="w-5 h-5 text-green-400 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                  </svg>
                   <span className="text-sm">Everything in Business</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="text-green-400 mr-2">✓</span>
-                  <span className="text-sm">White-label</span>
+                <li className="flex items-start text-gray-200">
+                  <svg className="w-5 h-5 text-green-400 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                  </svg>
+                  <span className="text-sm">White-label branding</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="text-green-400 mr-2">✓</span>
+                <li className="flex items-start text-gray-200">
+                  <svg className="w-5 h-5 text-green-400 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                  </svg>
                   <span className="text-sm">SSO & SAML</span>
                 </li>
-                <li className="flex items-start">
-                  <span className="text-green-400 mr-2">✓</span>
-                  <span className="text-sm">99.9% SLA</span>
+                <li className="flex items-start text-gray-200">
+                  <svg className="w-5 h-5 text-green-400 mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                  </svg>
+                  <span className="text-sm">99.9% SLA guarantee</span>
                 </li>
               </ul>
+              
               <button
                 onClick={handleGetStarted}
-                className="w-full py-3 bg-white text-gray-900 rounded-xl font-semibold hover:bg-gray-100 transition-all"
+                className="w-full py-3 px-4 bg-white text-gray-900 rounded-xl font-semibold hover:bg-gray-100 transition-all text-sm"
               >
                 Contact Sales
               </button>
