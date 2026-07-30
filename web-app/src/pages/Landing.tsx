@@ -23,35 +23,51 @@ const Landing: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
-      <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-lg border-b border-gray-200 z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+      <nav className="fixed top-0 w-full bg-white/95 backdrop-blur-lg border-b border-gray-200 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                <span className="text-2xl">📄</span>
+              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <span className="text-xl sm:text-2xl">📄</span>
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 SafeDoc AI
               </span>
             </div>
             
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-600 hover:text-gray-900">Features</a>
-              <a href="#pricing" className="text-gray-600 hover:text-gray-900">Pricing</a>
-              <a href="https://github.com/contactpromailco-cmd/SafeDoc" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-gray-900">
+            <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
+              <a href="#features" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Features</a>
+              <a href="#pricing" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Pricing</a>
+              <a href="https://github.com/contactpromailco-cmd/SafeDoc" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
                 GitHub
               </a>
               <button
                 onClick={handleLogin}
-                className="text-gray-600 hover:text-gray-900 font-medium"
+                className="text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors"
               >
                 Sign In
               </button>
               <button
                 onClick={handleGetStarted}
-                className="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:shadow-lg transition-all"
+                className="px-5 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm rounded-lg font-semibold hover:shadow-lg transition-all"
               >
                 Get Started Free
+              </button>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <div className="md:hidden flex items-center gap-2">
+              <button
+                onClick={handleLogin}
+                className="text-sm font-medium text-gray-600"
+              >
+                Sign In
+              </button>
+              <button
+                onClick={handleGetStarted}
+                className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm rounded-lg font-semibold"
+              >
+                Start Free
               </button>
             </div>
           </div>
@@ -59,59 +75,58 @@ const Landing: React.FC = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-6">
+      <section className="pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 md:pb-20 px-4 sm:px-6">
         <div className="max-w-7xl mx-auto text-center">
-          <div className="inline-block mb-4 px-4 py-2 bg-blue-50 rounded-full">
-            <span className="text-sm font-medium text-blue-600">
+          <div className="inline-block mb-4 sm:mb-6 px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-50 rounded-full">
+            <span className="text-xs sm:text-sm font-medium text-blue-600">
               🚀 All 11 Features Live • 50+ Languages • Enterprise Ready
             </span>
           </div>
           
-          <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
-            AI-Powered Documents
-            <br />
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 leading-tight px-4">
+            <span className="block text-gray-900 mb-2">AI-Powered Documents</span>
+            <span className="block bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               That Do Everything
             </span>
           </h1>
           
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-6 sm:mb-8 max-w-3xl mx-auto px-4">
             Generate, translate, sign, sync, and track business documents in seconds.
             From invoices to contracts, in 50+ languages, with full compliance.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12 px-4">
             <button
               onClick={handleGetStarted}
-              className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold text-lg hover:shadow-2xl transition-all transform hover:scale-105"
+              className="px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold text-base sm:text-lg hover:shadow-2xl transition-all transform hover:scale-105"
             >
               Start Free → 10 docs/month
             </button>
             <button
-              onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })}
-              className="px-8 py-4 bg-white border-2 border-gray-200 rounded-xl font-semibold text-lg hover:border-gray-300 transition-all"
+              onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+              className="px-6 sm:px-8 py-3 sm:py-4 bg-white border-2 border-gray-200 rounded-xl font-semibold text-base sm:text-lg hover:border-gray-300 transition-all"
             >
-              Watch Demo
+              View Features
             </button>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 max-w-4xl mx-auto px-4">
             <div>
-              <div className="text-3xl font-bold text-gray-900">11</div>
-              <div className="text-sm text-gray-600">Features</div>
+              <div className="text-2xl sm:text-3xl font-bold text-gray-900">11</div>
+              <div className="text-xs sm:text-sm text-gray-600">Features</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-gray-900">50+</div>
-              <div className="text-sm text-gray-600">Languages</div>
+              <div className="text-2xl sm:text-3xl font-bold text-gray-900">50+</div>
+              <div className="text-xs sm:text-sm text-gray-600">Languages</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-gray-900">1000+</div>
-              <div className="text-sm text-gray-600">Legal Clauses</div>
+              <div className="text-2xl sm:text-3xl font-bold text-gray-900">1000+</div>
+              <div className="text-xs sm:text-sm text-gray-600">Legal Clauses</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-gray-900">$12</div>
-              <div className="text-sm text-gray-600">/month Pro</div>
+              <div className="text-2xl sm:text-3xl font-bold text-gray-900">$12</div>
+              <div className="text-xs sm:text-sm text-gray-600">/month Pro</div>
             </div>
           </div>
         </div>
