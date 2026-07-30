@@ -9,9 +9,12 @@ import jwt from 'jsonwebtoken';
 interface User {
   id: string;
   email: string;
-  passwordHash: string;
+  passwordHash?: string; // Optional for OAuth users
   name: string;
   plan: 'free' | 'pro' | 'business';
+  provider?: 'email' | 'google' | 'apple' | 'github'; // Auth provider
+  providerId?: string; // Provider's user ID
+  picture?: string; // Profile picture
   stripeCustomerId?: string;
   stripeSubscriptionId?: string;
   documentsUsed: number;
@@ -128,6 +131,7 @@ class AuthService {
         passwordHash,
         name,
         plan: 'free',
+        provider: 'email',
         documentsUsed: 0,
         documentsLimit: this.PLAN_LIMITS.free,
         overageCount: 0,
@@ -180,6 +184,11 @@ class AuthService {
         return { success: false, error: 'Invalid email or password' };
       }
 
+      // Check if user uses OAuth (no password)
+      if (!foundUser.passwordHash) {
+        return { success: false, error: `This email uses ${foundUser.provider} sign-in. Please use "${foundUser.provider}" button to login.` };
+      }
+
       // Verify password
       const isValid = await this.verifyPassword(password, foundUser.passwordHash);
       if (!isValid) {
@@ -200,6 +209,7 @@ class AuthService {
           id: foundUser.id,
           email: foundUser.email,
           name: foundUser.name,
+          picture: foundUser.picture,
           plan: foundUser.plan,
           documentsUsed: foundUser.documentsUsed,
           documentsLimit: foundUser.documentsLimit,
@@ -212,6 +222,84 @@ class AuthService {
     } catch (error) {
       console.error('Login error:', error);
       return { success: false, error: 'Login failed' };
+    }
+  }
+
+  // OAuth login/register (Google, Apple, GitHub)
+  async oauthLogin(
+    email: string,
+    name: string,
+    provider: 'google' | 'apple' | 'github',
+    providerId: string,
+    picture?: string
+  ): Promise<{ success: boolean; user?: any; token?: string; isNewUser?: boolean; error?: string }> {
+    try {
+      // Check if user exists
+      let foundUser: User | undefined;
+      for (const user of this.users.values()) {
+        if (user.email.toLowerCase() === email.toLowerCase()) {
+          foundUser = user;
+          break;
+        }
+      }
+
+      let isNewUser = false;
+
+      if (foundUser) {
+        // Existing user - update provider info if needed
+        if (!foundUser.provider || foundUser.provider === 'email') {
+          foundUser.provider = provider;
+          foundUser.providerId = providerId;
+          foundUser.picture = picture;
+        }
+        foundUser.lastLogin = new Date();
+      } else {
+        // New user - create account
+        const userId = this.generateId();
+        foundUser = {
+          id: userId,
+          email: email.toLowerCase(),
+          name,
+          plan: 'free',
+          provider,
+          providerId,
+          picture,
+          documentsUsed: 0,
+          documentsLimit: this.PLAN_LIMITS.free,
+          overageCount: 0,
+          overageCost: 0,
+          createdAt: new Date(),
+          lastLogin: new Date(),
+          isVerified: true, // OAuth users are pre-verified
+        };
+
+        this.users.set(userId, foundUser);
+        isNewUser = true;
+        console.log(`✅ New OAuth user registered: ${email} (${provider})`);
+      }
+
+      // Generate token
+      const token = this.generateToken(foundUser.id, foundUser.email);
+
+      return {
+        success: true,
+        user: {
+          id: foundUser.id,
+          email: foundUser.email,
+          name: foundUser.name,
+          picture: foundUser.picture,
+          plan: foundUser.plan,
+          documentsUsed: foundUser.documentsUsed,
+          documentsLimit: foundUser.documentsLimit,
+          overageCount: foundUser.overageCount,
+          overageCost: foundUser.overageCost,
+        },
+        token,
+        isNewUser,
+      };
+    } catch (error) {
+      console.error('OAuth login error:', error);
+      return { success: false, error: 'OAuth login failed' };
     }
   }
 

@@ -123,6 +123,7 @@ app.get('/api/auth/me', requireAuth, (req, res) => {
       id: user.id,
       email: user.email,
       name: user.name,
+      picture: user.picture,
       plan: user.plan,
       documentsUsed: user.documentsUsed,
       documentsLimit: user.documentsLimit,
@@ -133,6 +134,146 @@ app.get('/api/auth/me', requireAuth, (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to get user' });
+  }
+});
+
+// ==================== OAUTH ROUTES ====================
+
+// OAuth login with Google
+app.post('/api/auth/oauth/google', async (req, res) => {
+  try {
+    const { idToken } = req.body;
+    
+    if (!idToken) {
+      return res.status(400).json({ error: 'ID token required' });
+    }
+
+    const OAuthService = require('./services/OAuthService').default;
+    const oauthService = new OAuthService();
+    
+    const oauthUser = await oauthService.verifyGoogleToken(idToken);
+    
+    if (!oauthUser) {
+      return res.status(401).json({ error: 'Invalid Google token' });
+    }
+
+    const result = await authService.oauthLogin(
+      oauthUser.email,
+      oauthUser.name,
+      'google',
+      oauthUser.id,
+      oauthUser.picture
+    );
+
+    if (!result.success) {
+      return res.status(500).json({ error: result.error });
+    }
+
+    res.json({ 
+      success: true, 
+      user: result.user, 
+      token: result.token,
+      isNewUser: result.isNewUser 
+    });
+  } catch (error) {
+    console.error('Google OAuth error:', error);
+    res.status(500).json({ error: 'Google authentication failed' });
+  }
+});
+
+// OAuth login with Apple
+app.post('/api/auth/oauth/apple', async (req, res) => {
+  try {
+    const { idToken, user } = req.body; // Apple sends user data on first sign-in only
+    
+    if (!idToken) {
+      return res.status(400).json({ error: 'ID token required' });
+    }
+
+    const OAuthService = require('./services/OAuthService').default;
+    const oauthService = new OAuthService();
+    
+    const oauthUser = await oauthService.verifyAppleToken(idToken);
+    
+    if (!oauthUser) {
+      return res.status(401).json({ error: 'Invalid Apple token' });
+    }
+
+    // Use name from user object if provided (first sign-in only)
+    if (user?.name) {
+      oauthUser.name = `${user.name.firstName || ''} ${user.name.lastName || ''}`.trim();
+    }
+
+    const result = await authService.oauthLogin(
+      oauthUser.email,
+      oauthUser.name,
+      'apple',
+      oauthUser.id
+    );
+
+    if (!result.success) {
+      return res.status(500).json({ error: result.error });
+    }
+
+    res.json({ 
+      success: true, 
+      user: result.user, 
+      token: result.token,
+      isNewUser: result.isNewUser 
+    });
+  } catch (error) {
+    console.error('Apple OAuth error:', error);
+    res.status(500).json({ error: 'Apple authentication failed' });
+  }
+});
+
+// OAuth login with GitHub
+app.post('/api/auth/oauth/github', async (req, res) => {
+  try {
+    const { code } = req.body;
+    
+    if (!code) {
+      return res.status(400).json({ error: 'Authorization code required' });
+    }
+
+    const OAuthService = require('./services/OAuthService').default;
+    const oauthService = new OAuthService();
+    
+    // Exchange code for access token
+    const accessToken = await oauthService.exchangeGitHubCode(code);
+    
+    if (!accessToken) {
+      return res.status(401).json({ error: 'Failed to exchange GitHub code' });
+    }
+
+    // Verify token and get user info
+    const oauthUser = await oauthService.verifyGitHubToken(accessToken);
+    
+    if (!oauthUser) {
+      return res.status(401).json({ error: 'Invalid GitHub token' });
+    }
+
+    const result = await authService.oauthLogin(
+      oauthUser.email,
+      oauthUser.name,
+      'github',
+      oauthUser.id,
+      oauthUser.picture
+    );
+
+    if (!result.success) {
+      return res.status(500).json({ error: result.error });
+    }
+
+    res.json({ 
+      success: true, 
+      user: result.user, 
+      token: result.token,
+      isNewUser: result.isNewUser 
+    });
+  } catch (error) {
+    console.error('GitHub OAuth error:', error);
+    res.status(500).json({ error: 'GitHub authentication failed' });
   }
 });
 
