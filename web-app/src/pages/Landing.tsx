@@ -4,6 +4,7 @@
  */
 
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import AuthModal from '../components/AuthModal';
 
 const Landing: React.FC = () => {
@@ -226,8 +227,8 @@ const Landing: React.FC = () => {
                     {feature.badge}
                   </span>
                 </div>
-                <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
-                <p className="text-gray-600 text-sm">{feature.description}</p>
+                <h3 className="text-lg font-semibold mb-2 text-gray-900">{feature.title}</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -460,9 +461,9 @@ const Landing: React.FC = () => {
             <div>
               <h3 className="font-semibold text-white mb-3">Product</h3>
               <ul className="space-y-2 text-sm">
-                <li><a href="#features" className="hover:text-white">Features</a></li>
-                <li><a href="#pricing" className="hover:text-white">Pricing</a></li>
-                <li><a href="https://github.com/contactpromailco-cmd/SafeDoc" target="_blank" rel="noopener noreferrer" className="hover:text-white">API Docs</a></li>
+                <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
+                <li><a href="#pricing" className="hover:text-white transition-colors">Pricing</a></li>
+                <li><a href="https://github.com/contactpromailco-cmd/SafeDoc#api" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Documentation</a></li>
               </ul>
             </div>
             <div>
@@ -476,9 +477,9 @@ const Landing: React.FC = () => {
             <div>
               <h3 className="font-semibold text-white mb-3">Legal</h3>
               <ul className="space-y-2 text-sm">
-                <li><a href="/privacy" className="hover:text-white">Privacy Policy</a></li>
-                <li><a href="/terms" className="hover:text-white">Terms of Service</a></li>
-                <li><a href="https://github.com/contactpromailco-cmd/SafeDoc" target="_blank" rel="noopener noreferrer" className="hover:text-white">Security</a></li>
+                <li><Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
+                <li><a href="https://github.com/contactpromailco-cmd/SafeDoc/blob/main/SECURITY_GUIDE.md" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Security</a></li>
               </ul>
             </div>
           </div>
