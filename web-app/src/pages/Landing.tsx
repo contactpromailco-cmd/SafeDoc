@@ -442,8 +442,19 @@ const Landing: React.FC = () => {
                 <span className="text-2xl">📄</span>
                 <span className="text-xl font-bold text-white">SafeDoc AI</span>
               </div>
-              <p className="text-sm">
+              <p className="text-sm mb-4">
                 AI-powered business documents. Generate, translate, sign, and sync in seconds.
+              </p>
+              <p className="text-sm text-gray-400">
+                Made with 💙 by{' '}
+                <a
+                  href="https://toolsetlabs.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:text-blue-300 font-semibold"
+                >
+                  Toolset
+                </a>
               </p>
             </div>
             <div>
@@ -458,21 +469,32 @@ const Landing: React.FC = () => {
               <h3 className="font-semibold text-white mb-3">Company</h3>
               <ul className="space-y-2 text-sm">
                 <li><a href="https://github.com/contactpromailco-cmd/SafeDoc" target="_blank" rel="noopener noreferrer" className="hover:text-white">GitHub</a></li>
-                <li><a href="#" className="hover:text-white">Blog</a></li>
-                <li><a href="#" className="hover:text-white">Contact</a></li>
+                <li><a href="https://toolsetlabs.com" target="_blank" rel="noopener noreferrer" className="hover:text-white">Toolset Labs</a></li>
+                <li><a href="mailto:support@safedoc.ai" className="hover:text-white">Contact</a></li>
               </ul>
             </div>
             <div>
               <h3 className="font-semibold text-white mb-3">Legal</h3>
               <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">Privacy</a></li>
-                <li><a href="#" className="hover:text-white">Terms</a></li>
-                <li><a href="#" className="hover:text-white">Security</a></li>
+                <li><a href="/privacy" className="hover:text-white">Privacy Policy</a></li>
+                <li><a href="/terms" className="hover:text-white">Terms of Service</a></li>
+                <li><a href="https://github.com/contactpromailco-cmd/SafeDoc" target="_blank" rel="noopener noreferrer" className="hover:text-white">Security</a></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm">
-            <p>© 2025 SafeDoc AI. All rights reserved. Built with 💙 and AI.</p>
+            <p>© 2025 SafeDoc AI. All rights reserved.</p>
+            <p className="mt-2 text-gray-400">
+              Built with 💙 and AI by{' '}
+              <a
+                href="https://toolsetlabs.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-400 hover:text-blue-300 font-semibold"
+              >
+                Toolset
+              </a>
+            </p>
           </div>
         </div>
       </footer>
