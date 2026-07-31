@@ -219,16 +219,20 @@ const Landing: React.FC = () => {
             ].map((feature, i) => (
               <div
                 key={i}
-                className="bg-white p-6 rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all"
+                className="bg-white p-6 rounded-2xl border-2 border-gray-200 hover:border-blue-400 hover:shadow-xl transition-all"
               >
-                <div className="flex items-start justify-between mb-3">
+                <div className="flex items-start justify-between mb-4">
                   <div className="text-4xl">{feature.icon}</div>
-                  <span className="text-xs font-medium px-2 py-1 bg-blue-50 text-blue-600 rounded-full">
+                  <span className="text-xs font-bold px-3 py-1 bg-blue-100 text-blue-700 rounded-full border border-blue-200">
                     {feature.badge}
                   </span>
                 </div>
-                <h3 className="text-lg font-semibold mb-2 text-gray-900">{feature.title}</h3>
-                <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
+                <h3 className="text-lg font-bold mb-3 text-gray-900" style={{ color: '#111827' }}>
+                  {feature.title}
+                </h3>
+                <p className="text-sm text-gray-700 leading-relaxed" style={{ color: '#374151' }}>
+                  {feature.description}
+                </p>
               </div>
             ))}
           </div>
