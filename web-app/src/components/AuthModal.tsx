@@ -5,6 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { API_URL, OAUTH_CONFIG } from '../config';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -75,7 +76,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
     setError('');
 
     try {
-      const response = await fetch('http://localhost:8081/api/auth/oauth/google', {
+      const response = await fetch(`${API_URL}/api/auth/oauth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ idToken: credential }),
@@ -103,9 +104,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
 
   const handleGitHubSignIn = () => {
     // Redirect to GitHub OAuth
-    const clientId = 'YOUR_GITHUB_CLIENT_ID'; // TODO: Replace with actual client ID or get from env
-    const redirectUri = encodeURIComponent('http://localhost:3000/auth/github/callback');
-    window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=user:email`;
+    const redirectUri = encodeURIComponent(OAUTH_CONFIG.github.redirectUri);
+    window.location.href = `https://github.com/login/oauth/authorize?client_id=${OAUTH_CONFIG.github.clientId}&redirect_uri=${redirectUri}&scope=user:email`;
   };
 
   // Initialize Google Sign-In button
@@ -114,7 +114,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, defaultMode = 'l
       setTimeout(() => {
         try {
           window.google.accounts.id.initialize({
-            client_id: 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com', // TODO: Replace with actual client ID
+            client_id: OAUTH_CONFIG.google.clientId,
             callback: (response: any) => {
               handleGoogleSignIn(response.credential);
             },

@@ -4,6 +4,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { API_URL } from '../config';
 
 interface PricingModalProps {
   isOpen: boolean;
@@ -26,7 +27,7 @@ const PricingModal: React.FC<PricingModalProps> = ({ isOpen, onClose }) => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8080/api/payments/create-checkout', {
+      const response = await fetch(`${API_URL}/api/payments/create-checkout`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

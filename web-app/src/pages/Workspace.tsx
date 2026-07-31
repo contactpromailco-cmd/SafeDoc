@@ -7,6 +7,7 @@ import { useWebSocketStore } from '../store/websocket-pusher';
 import { useAuth } from '../contexts/AuthContext';
 import AuthModal from '../components/AuthModal';
 import PricingModal from '../components/PricingModal';
+import { API_URL } from '../config';
 
 type DocumentTemplate = {
   id: string;
@@ -260,7 +261,7 @@ const Workspace: React.FC = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:8080/api/documents/generate', {
+      const response = await fetch(`${API_URL}/api/documents/generate`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -324,7 +325,7 @@ const Workspace: React.FC = () => {
     }
 
     // Otherwise download as ODF
-    fetch('http://localhost:8080/api/documents/export-odf', {
+    fetch(`${API_URL}/api/documents/export-odf`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ documentId: doc.metadata.id })
@@ -368,7 +369,7 @@ const Workspace: React.FC = () => {
       reader.onloadend = async () => {
         const imageData = reader.result as string;
 
-        const response = await fetch('http://localhost:8080/api/documents/snap-generate', {
+        const response = await fetch(`${API_URL}/api/documents/snap-generate`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -421,7 +422,7 @@ const Workspace: React.FC = () => {
       }
 
       // Call fraud detection API
-      const response = await fetch('http://localhost:8080/api/documents/analyze-fraud', {
+      const response = await fetch(`${API_URL}/api/documents/analyze-fraud`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -502,7 +503,7 @@ const Workspace: React.FC = () => {
 
     try {
       // Use AI to understand voice command and generate document
-      const response = await fetch('http://localhost:8080/api/documents/voice-generate', {
+      const response = await fetch(`${API_URL}/api/documents/voice-generate`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -578,7 +579,7 @@ const Workspace: React.FC = () => {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch('http://localhost:8080/api/negotiation/suggest', {
+      const response = await fetch(`${API_URL}/api/negotiation/suggest`, {
         method: 'POST',
         headers,
         body: JSON.stringify({
@@ -626,7 +627,7 @@ const Workspace: React.FC = () => {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch('http://localhost:8080/api/negotiation/accept', {
+      const response = await fetch(`${API_URL}/api/negotiation/accept`, {
         method: 'POST',
         headers,
         body: JSON.stringify({

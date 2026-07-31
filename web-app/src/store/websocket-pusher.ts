@@ -6,6 +6,7 @@
 import { create } from 'zustand';
 import Pusher from 'pusher-js';
 import { MessageType, type Document, type AppState } from '@safedoc/shared';
+import { API_URL, PUSHER_CONFIG } from '../config';
 
 interface WebSocketState {
   connected: boolean;
@@ -17,10 +18,6 @@ interface WebSocketState {
   updateAppState: (state: Partial<AppState>) => void;
   setActiveDocument: (document: Document | null) => void;
 }
-
-const PUSHER_KEY = import.meta.env.VITE_PUSHER_KEY || 'ab96fbeb449d4f90ca68';
-const PUSHER_CLUSTER = import.meta.env.VITE_PUSHER_CLUSTER || 'eu';
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081';
 
 let pusher: Pusher | null = null;
 
@@ -42,8 +39,8 @@ export const useWebSocketStore = create<WebSocketState>((set, get) => ({
 
     console.log('Connecting to Pusher...');
 
-    pusher = new Pusher(PUSHER_KEY, {
-      cluster: PUSHER_CLUSTER,
+    pusher = new Pusher(PUSHER_CONFIG.key, {
+      cluster: PUSHER_CONFIG.cluster,
     });
 
     const channel = pusher.subscribe('documents');
