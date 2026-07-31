@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useWebSocketStore } from '../store/websocket-pusher';
-import { MessageType, DocumentType } from '@safedoc/shared';
+import { MessageType, DocumentType } from '../types/shared';
 
 const COMMAND_PATTERNS = [
   { command: '/invoice', type: DocumentType.INVOICE, description: 'Create an invoice' },

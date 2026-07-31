@@ -5,7 +5,7 @@
 
 import { create } from 'zustand';
 import Pusher from 'pusher-js';
-import { MessageType, type Document, type AppState } from '@safedoc/shared';
+import { MessageType, type Document, type AppState } from '../types/shared';
 import { API_URL, PUSHER_CONFIG } from '../config';
 
 interface WebSocketState {

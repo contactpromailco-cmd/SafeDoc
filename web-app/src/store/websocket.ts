@@ -6,10 +6,12 @@
 import { create } from 'zustand';
 import {
   MessageType,
-  type Message,
   type AppState,
   type Document,
-} from '@safedoc/shared';
+} from '../types/shared';
+
+// Define Message type locally since we don't use it much
+type Message = any;
 
 interface WebSocketState {
   ws: WebSocket | null;

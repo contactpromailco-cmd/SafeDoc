@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { Document, RiskLevel } from '@safedoc/shared';
+import { Document, RiskLevel } from '../types/shared';
 
 interface RiskVisualizerProps {
   document: Document | null;

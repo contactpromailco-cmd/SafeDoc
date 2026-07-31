@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { useWebSocketStore } from '../store/websocket-pusher';
-import { DocumentType } from '@safedoc/shared';
+import { DocumentType } from '../types/shared';
 
 const HistoryPanel: React.FC = () => {
   const documents = useWebSocketStore((state) => state.appState.documents);
